@@ -81,7 +81,7 @@ The method returns nothing. A result of the operation may be obtained via the [o
 | Parameter | Data Type | Description |
 | --- | --- | --- |
 | *error* | Integer | `0` if the authentication is successful, an [error code](#error-code) otherwise. See possible HTTP error codes [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors). |
-| *response* | Table | Key-value table with the response provided by Amazon server. May be empty. [See here about the response format](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-response). Also may contain an error details described [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#authorization-errors). |
+| *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. [See here about the response format](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-response). Also may contain an error details described [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#authorization-errors). |
 
 TODO: could be some exceptions
 
@@ -129,7 +129,7 @@ The method returns nothing. A result of the operation may be obtained via the [o
 | Parameter | Data Type | Description |
 | --- | --- | --- |
 | *error* | Integer | `0` if the operation is completed successfully, an [error code](#error-code) otherwise. See possible HTTP error codes [here](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses). |
-| *response* | Table | Key-value table with the response provided by Amazon server. May be empty. [See response example](https://developer.amazon.com/docs/dash/replenish-endpoint.html#response-example). Also may contain an [error details](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses). |
+| *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. [See response example](https://developer.amazon.com/docs/dash/replenish-endpoint.html#response-example). Also may contain an [error details](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses). |
 
 #### Example ####
 
@@ -155,7 +155,7 @@ The method returns nothing. A result of the operation may be obtained via the [o
 | Parameter | Data Type | Description |
 | --- | --- | --- |
 | *error* | Integer | `0` if the operation is completed successfully, an [error code](#error-code) otherwise. See possible HTTP error codes [here](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses). |
-| *response* | Table | Key-value table with the response provided by Amazon server. May be empty. [See response example](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#response-example). Also may contain an [error details](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses). |
+| *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. [See response example](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#response-example). Also may contain an [error details](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses). |
 
 #### Example ####
 
