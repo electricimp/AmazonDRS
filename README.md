@@ -152,7 +152,7 @@ The method can only be used for the orders made by a test device ([a device auth
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
-| *slotId* | String | Yes | ID of a slot to be canceled. If is `null` or not specified test orders for all slots in the device will be canceled. |
+| *slotId* | String | Optional | ID of a slot to be canceled. If is `null` or not specified, test orders for all slots in the device will be canceled. |
 | *onCanceled* | Function | Optional | Callback called when the operation is completed or an error happens. |
 
 The method returns nothing. A result of the operation may be obtained via the [onCanceled](TODO) callback, if specified in this method.
