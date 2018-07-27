@@ -37,6 +37,13 @@ More about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-
 
 **Note**: After each restart of the agent the `Refresh Token` should be passed in to the library. So if you don't want to go through the authentication steps again, you may save the token in the agent's persistent storage and set it with the [setRefreshToken()](TODO) method after each restart of the agent.
 
+### Test Orders ###
+
+For testing purposes Amazon DRS allows to make test orders. Test orders are those that made by a DRS device authenticated as a test device. So it is determined at the step of authentication whether the device is for testing or not.
+Due to this the [login()](TODO) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](TODO) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
+
+Also, only test orders can be canceled with the [DRS API](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html).
+
 ### Callbacks ###
 
 All requests that are made to the Amazon platform occur asynchronously. Every method that sends a request has an optional parameter which takes a callback function that will be executed when the operation is completed, whether successfully or not. The callback’s parameters are listed in the corresponding method description, but every callback has at least one parameter, *error*. If *error* is `0`, the operation has been executed successfully. Otherwise, *error* is a code of an error.
@@ -72,7 +79,7 @@ Either this method or [setRefreshToken()](TODO) should be called and authenticat
 | *deviceModel* | String | Yes | `Device Model`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
 | *deviceSerial* | String | Yes | `Device Serial`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
 | *onAuthenticated* | Function | Optional | Callback called when the operation is completed or an error happens. |
-| *testDevice* | Boolean | Optional | `True` if it is a test device making test orders. `False` by default. For more information, please see [here](https://developer.amazon.com/docs/dash/test-device-purchases.html). |
+| *testDevice* | Boolean | Optional | `True` if it is a test device. `False` by default. For more information, please see [here](https://developer.amazon.com/docs/dash/test-device-purchases.html) and the [Test Orders section](#test-orders). |
 
 The method returns nothing. A result of the operation may be obtained via the [onAuthenticated](TODO) callback, if specified in this method.
 
@@ -141,7 +148,7 @@ TODO
 
 This method cancels test orders for one or all slots in the device. For more information, please see [the Amazon DRS documentation](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html).
 
-The method can only be used for the orders made by a test device ([a device authenticated as a test one](https://developer.amazon.com/docs/dash/test-device-purchases.html)). The library does not check if your device authenticated as a test one or not, so you are responsible for this check.
+The method can only be used for the orders made by a test device ([a device authenticated as a test one](https://developer.amazon.com/docs/dash/test-device-purchases.html)). The library does not check if your device authenticated as a test one or not, so you are responsible for this check. See the [Test Orders section](#test-orders).
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -178,8 +185,6 @@ An *Integer* error code which specifies a concrete error (if any) happened durin
 | 100-999 | HTTP error codes from Amazon server. See methods' descriptions for more information. |
 | 1000 | The client is not authenticated. |
 | 1001 | The authentication process is already started. |
-| 1002 | The operation is not allowed now. Eg. the same operation is already in process. |
-| 1003 | The operation is timed out. |
 | 1010 | General error. |
 
 ## Examples ##
