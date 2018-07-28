@@ -64,6 +64,7 @@ This stage is used to authenticate the imp application in Amazon.
     2. **Model ID**: `example_model`
 ![Fill in the fields](images/CreateDevice.png "Fill in the fields")
 1. Click **Save**.
+1. Then you'll be taken to your new device's page.
 1. Open the **Slot Localization** tab and make a note of **Slot ID**.
 ![Make a note of Slot ID](images/SlotID.png "Make a note of Slot ID")
 
@@ -82,6 +83,7 @@ This stage is used to authenticate the imp application in Amazon.
 ![In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging](images/Run.png "In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging")
     1. You will be redirected to the login page.
     1. Log into Amazon *on that page* and go through the suggested setup steps.
+    ![Go through the suggested setup steps](images/AmazonSetup.png "Go through the suggested setup steps")
     1. After that the page should display **Authentication complete - you may now close this window**.
     1. Close that page and return to impCentral.
 1. Make sure there are no errors in the logs.
