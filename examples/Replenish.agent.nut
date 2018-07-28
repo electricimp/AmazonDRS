@@ -96,9 +96,9 @@ class ReplenishExample {
 // ---------------------------------------------------------------------------------
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
-const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
 const AMAZON_DRS_SLOT_ID = "<YOUR_AMAZON_SLOT_ID>";
 
+const AMAZON_DRS_DEVICE_MODEL = "example_model";
 const AMAZON_DRS_DEVICE_SERIAL = "ReplenishExample";
 
 // Start Application
