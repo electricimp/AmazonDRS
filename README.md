@@ -42,7 +42,7 @@ More about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-
 For testing purposes Amazon DRS allows to make [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those that made by a DRS device authenticated as a test device. So it is determined at the step of authentication whether the device is for testing or not.
 Due to this the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
 
-Also, only test orders can be canceled with the [DRS API](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html).
+Only test orders can be canceled with the [cancelTestOrder()](#canceltestorderslotid-oncanceled) method.
 
 ### Callbacks ###
 
