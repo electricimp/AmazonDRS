@@ -24,9 +24,9 @@ Before using the library you need to have:
 ### Authentication ###
 
 This library needs a `Refresh Token` to be able to call the Amazon's DRS API.
-The `Refresh Token` can be acquired with the [login()](TODO) method. Also it can be acquired with any other application-specific way and then passed in with the [setRefreshToken()](TODO) method.
+The `Refresh Token` can be acquired with the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method. Also it can be acquired with any other application-specific way and then passed in with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method.
 
-The [login()](TODO) method provides the following authentication flow:
+The [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method provides the following authentication flow:
 1. a user opens the agent's URL in a browser
 1. the library handles this request and redirects the user to the Amazon login page or to the Amazon device's settings page if the user is already logged in
 1. the user sets up the device in the Amazon's UI
@@ -35,12 +35,12 @@ The [login()](TODO) method provides the following authentication flow:
 
 More about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-api.html) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html).
 
-**Note**: After each restart of the agent the `Refresh Token` should be passed in to the library. So if you don't want to go through the authentication steps again, you may save the token in the agent's persistent storage and set it with the [setRefreshToken()](TODO) method after each restart of the agent.
+**Note**: After each restart of the agent the `Refresh Token` should be passed in to the library. So if you don't want to go through the authentication steps again, you may save the token in the agent's persistent storage and set it with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method after each restart of the agent.
 
 ### Test Orders ###
 
 For testing purposes Amazon DRS allows to make [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those that made by a DRS device authenticated as a test device. So it is determined at the step of authentication whether the device is for testing or not.
-Due to this the [login()](TODO) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](TODO) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
+Due to this the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
 
 Also, only test orders can be canceled with the [DRS API](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html).
 
@@ -59,20 +59,15 @@ This method returns a new AmazonDRS instance.
 | *clientId* | String | Yes | `Client ID` of your LWA Security Profile. For information, please see [here](https://developer.amazon.com/docs/login-with-amazon/glossary.html#client_identifier). |
 | *clientSecret* | String | Yes | `Client Secret` of your LWA Security Profile. For information, please see [here](https://developer.amazon.com/docs/login-with-amazon/glossary.html#client_secret). |
 
-#### Example ####
-
-```
-#require "AmazonDRS.agent.lib.nut:1.0.0"
-TODO
-```
-
 ### login(*deviceModel, deviceSerial[, onAuthenticated[, testDevice]]*) ###
 
-This method allows to authenticate the agent on the Amazon and get required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call the [setRefreshToken()](TODO) method. For more information, please read about [authentication](#authentication). 
+This method allows to authenticate the agent on the Amazon and get required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call the [setRefreshToken()](#setrefreshtokenrefreshtoken) method. For more information, please read about [authentication](#authentication). 
 
-Either this method or [setRefreshToken()](TODO) should be called and authentication should be done before making any DRS-related requests.
+Either this method or [setRefreshToken()](#setrefreshtokenrefreshtoken) should be called and authentication should be done before making any DRS-related requests.
 
 **If you are going to use this method, please add** `#require "Rocky.class.nut:2.0.1"` **to the top of your agent code.**
+
+If the **Rocky** library is not included, the method will throw an exception.
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -81,7 +76,7 @@ Either this method or [setRefreshToken()](TODO) should be called and authenticat
 | *onAuthenticated* | Function | Optional | Callback called when the operation is completed or an error happens. |
 | *testDevice* | Boolean | Optional | `True` if it is a test device. `False` by default. For more information, please see [here](https://developer.amazon.com/docs/dash/test-device-purchases.html) and the [Test Orders section](#test-orders). |
 
-The method returns nothing. A result of the operation may be obtained via the [onAuthenticated](TODO) callback, if specified in this method.
+The method returns nothing. A result of the operation may be obtained via the [onAuthenticated](#callback-onauthenticatederror-response) callback, if specified in this method.
 
 #### Callback: onAuthenticated(*error, response*) ####
 
@@ -90,19 +85,36 @@ The method returns nothing. A result of the operation may be obtained via the [o
 | *error* | Integer | `0` if the authentication is successful, an [error code](#error-code) otherwise. See possible HTTP error codes [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors). |
 | *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. [See here about the response format](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-response). Also may contain an error details described [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#authorization-errors). |
 
-TODO: could be some exceptions
-
 #### Example ####
 
 ```
-TODO
+#require "Rocky.class.nut:2.0.1"
+#require "AmazonDRS.agent.lib.nut:1.0.0"
+
+const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
+const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
+const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
+const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
+
+testDevice <- true;
+
+function onAuthenticated(error, response) {
+    if (error != 0) {
+        server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
+    server.log("Successfully authenticated!");
+}
+
+client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
+client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
 ```
 
 ### setRefreshToken(*refreshToken*) ###
 
 This method allows to set a `Refresh Token` manually. For more information, please read about [authentication](#authentication). 
 
-Either this method or [login()](TODO) should be called and authentication should be done before making any DRS-related requests.
+Either this method or [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) should be called and authentication should be done before making any DRS-related requests.
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -113,7 +125,14 @@ The method returns nothing.
 #### Example ####
 
 ```
-TODO
+#require "AmazonDRS.agent.lib.nut:1.0.0"
+
+const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
+const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
+const AMAZON_DRS_REFRESH_TOKEN = "<YOUR_AMAZON_VALID_REFRESH_TOKEN>";
+
+client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
+client.setRefreshToken(AMAZON_DRS_REFRESH_TOKEN);
 ```
 
 ### getRefreshToken() ###
@@ -129,7 +148,7 @@ This method places an order for a device/slot combination. For more information,
 | *slotId* | String | Yes | ID of a slot to place an order for it. |
 | *onReplenished* | Function | Optional | Callback called when the operation is completed or an error happens. |
 
-The method returns nothing. A result of the operation may be obtained via the [onReplenished](TODO) callback, if specified in this method.
+The method returns nothing. A result of the operation may be obtained via the [onReplenished](#callback-onreplenishederror-response) callback, if specified in this method.
 
 #### Callback: onReplenished(*error, response*) ####
 
@@ -141,7 +160,18 @@ The method returns nothing. A result of the operation may be obtained via the [o
 #### Example ####
 
 ```
-TODO
+const AMAZON_DRS_SLOT_ID = "<YOUR_AMAZON_SLOT_ID>";
+
+function onReplenished(error, response) {
+    if (error != 0) {
+        server.error("Error replenishing: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
+    server.log("An order has been placed. Response from server: " + http.jsonencode(response));
+}
+
+// It is supposed that the client has been authenticated with either login() method or setRefreshToken() method
+client.replenish(AMAZON_DRS_SLOT_ID, onReplenished.bindenv(this));
 ```
 
 ### cancelTestOrder(*[slotId[, onCanceled]]*) ###
@@ -155,7 +185,7 @@ The method can only be used for the orders made by a test device ([a device auth
 | *slotId* | String | Optional | ID of a slot to be canceled. If is `null` or not specified, test orders for all slots in the device will be canceled. |
 | *onCanceled* | Function | Optional | Callback called when the operation is completed or an error happens. |
 
-The method returns nothing. A result of the operation may be obtained via the [onCanceled](TODO) callback, if specified in this method.
+The method returns nothing. A result of the operation may be obtained via the [onCanceled](#callback-oncancelederror-response) callback, if specified in this method.
 
 #### Callback: onCanceled(*error, response*) ####
 
@@ -167,7 +197,19 @@ The method returns nothing. A result of the operation may be obtained via the [o
 #### Example ####
 
 ```
-TODO
+const AMAZON_DRS_SLOT_ID = "<YOUR_AMAZON_SLOT_ID>";
+
+function onCanceled(error, response) {
+    if (error != 0) {
+        server.error("Error canceling: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
+    server.log("The order has been canceled. Response from server: " + http.jsonencode(response));
+}
+
+// It is supposed that client has been authenticated with either login() method or setRefreshToken() method
+// as a test DRS device
+client.cancelTestOrder(AMAZON_DRS_SLOT_ID, onCanceled.bindenv(this));
 ```
 
 ### setDebug(*value*) ###
@@ -183,7 +225,7 @@ An *Integer* error code which specifies a concrete error (if any) happened durin
 | 0 | No error. |
 | 1-99 | [Internal errors of the HTTP API](https://developer.electricimp.com/api/httprequest/sendasync). |
 | 100-999 | HTTP error codes from Amazon server. See methods' descriptions for more information. |
-| 1000 | The client is not authenticated. |
+| 1000 | The client is not authenticated. E.g. `Refresh Token` is invalid or not set. |
 | 1001 | The authentication process is already started. |
 | 1010 | General error. |
 
