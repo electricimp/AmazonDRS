@@ -50,7 +50,8 @@ class ReplenishExample {
     }
 
     function start() {
-        _amazonDRSClient.login(_deviceModel, _deviceSerial, onAuthenticated.bindenv(this), true);
+        local testDevice = true;
+        _amazonDRSClient.login(_deviceModel, _deviceSerial, onAuthenticated.bindenv(this), testDevice);
     }
 
     function onAuthenticated(error, response) {
@@ -59,6 +60,7 @@ class ReplenishExample {
             return;
         }
         server.log("Successfully authenticated!");
+        server.log("Your Refresh Token is " + _amazonDRSClient.getRefreshToken());
         replenish();
     }
 
