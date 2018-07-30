@@ -27,7 +27,7 @@
 
 // AmazonDRS library example:
 // - authenticates the device on Amazon platform using the provided Client ID and Client Secret
-// - executes the following cycle: places an order, waits for 8 sec, cancels the order, waits for 12 sec
+// - executes the following cycle: places a test order, waits for 8 sec, cancels the order, waits for 12 sec
 // - logs all responses received from the Amazon DRS
 
 // Number of seconds to wait before cancel an order

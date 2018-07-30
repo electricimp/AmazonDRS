@@ -149,8 +149,9 @@ class AmazonDRS {
                     return;
                 }
 
+                // TODO: Should we make some defense from infinite recursion?
                 replenish(slotId, onReplenished);
-            }
+            }.bindenv(this);
 
             _refreshAccessToken(onRefreshed);
             return;
@@ -197,8 +198,9 @@ class AmazonDRS {
                     return;
                 }
 
+                // TODO: Should we make some defense from infinite recursion?
                 cancelTestOrder(slotId, onCanceled);
-            }
+            }.bindenv(this);
 
             _refreshAccessToken(onRefreshed);
             return;
@@ -238,7 +240,7 @@ class AmazonDRS {
     // -------------------- PRIVATE METHODS -------------------- //
 
     function _defineLoginEndpoint(deviceModel, deviceSerial, testDevice, callback) {
-        // Define log in endpoint for a GET request to the agent URL
+        // Define login endpoint for GET requests to the agent URL
         rocky.get(LOGIN_ENDPOINT, function(context) {
             if ("error" in context.req.query) {
                 callback && callback(AMAZON_DRS_ERROR_GENERAL, context.req.query)
@@ -266,7 +268,7 @@ class AmazonDRS {
         // TODO: How to properly undefine the endpoint?
         rocky.get(LOGIN_ENDPOINT, function(context) {
             context.send(503, "Authentication is finished. You may reactivate it with login() method.");
-        });
+        }.bindenv(this));
     }
 
     function _onAccessTokenReceived(err, respBody, context, callback) {
@@ -340,7 +342,7 @@ class AmazonDRS {
             }
 
             callback && callback(err, respBody);
-        }
+        }.bindenv(this);
 
         // Send request with refresh token
         _oauthTokenRequest("refresh_token", _refreshToken, refreshed);
