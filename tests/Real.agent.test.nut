@@ -25,17 +25,17 @@
 @include "github:electricimp/Rocky/Rocky.class.nut@v2.0.1"
 
 
-const REAL_TEST_CLIENT_ID = "@{REAL_TEST_CLIENT_ID}";
-const REAL_TEST_CLIENT_SECRET = "@{REAL_TEST_CLIENT_SECRET}";
-const REAL_TEST_REFRESH_TOKEN = "@{REAL_TEST_REFRESH_TOKEN}";
-const REAL_TEST_SLOT_ID = "@{REAL_TEST_SLOT_ID}";
+const AMAZON_DRS_CLIENT_ID = "@{AMAZON_DRS_CLIENT_ID}";
+const AMAZON_DRS_CLIENT_SECRET = "@{AMAZON_DRS_CLIENT_SECRET}";
+const AMAZON_DRS_REFRESH_TOKEN = "@{AMAZON_DRS_REFRESH_TOKEN}";
+const AMAZON_DRS_SLOT_ID = "@{AMAZON_DRS_SLOT_ID}";
 
 class RealTestCase extends ImpTestCase {
     _amazonDRSClient = null;
 
     function setUp() {
-        _amazonDRSClient = AmazonDRS(REAL_TEST_CLIENT_ID, REAL_TEST_CLIENT_SECRET);
-        _amazonDRSClient.setRefreshToken(REAL_TEST_REFRESH_TOKEN);
+        _amazonDRSClient = AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
+        _amazonDRSClient.setRefreshToken(AMAZON_DRS_REFRESH_TOKEN);
     }
 
     function testReplenishCancel() {
@@ -51,7 +51,7 @@ class RealTestCase extends ImpTestCase {
 
     function _replenish() {
         return Promise(function (resolve, reject) {
-            _amazonDRSClient.replenish(REAL_TEST_SLOT_ID, function (err, response) {
+            _amazonDRSClient.replenish(AMAZON_DRS_SLOT_ID, function (err, response) {
                 if (err == 0) {
                     return resolve();
                 }
@@ -62,7 +62,7 @@ class RealTestCase extends ImpTestCase {
 
     function _cancelTestOrder() {
         return Promise(function (resolve, reject) {
-            _amazonDRSClient.cancelTestOrder(REAL_TEST_SLOT_ID, function (err, response) {
+            _amazonDRSClient.cancelTestOrder(AMAZON_DRS_SLOT_ID, function (err, response) {
                 if (err == 0) {
                     return resolve();
                 }
