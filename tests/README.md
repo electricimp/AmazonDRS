@@ -8,7 +8,7 @@ The tests for AmazonDRS library require pre-setup described below.
 
 ## Obtain required credentials ##
 
-Firstly, you need to go through [the example's instructions](../examples/README.md#example-setup-and-run) to obtatin required data.
+Firstly, you need to go through [the example's instructions](../examples/README.md#example-setup-and-run) to obtain required data.
 
 ## Set Environment Variables ##
 
