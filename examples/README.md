@@ -89,4 +89,5 @@ This stage is used to authenticate the imp application in Amazon.
 1. Make sure there are no errors in the logs.
 1. Make sure there are periodic logs like this:
 ![Make sure there are periodic logs like this](images/PeriodicLogs.png "Make sure there are periodic logs like this")
+**Note**: The message "Your Refresh Token is Atzr|IwEB..." contains your **Refresh Token**. You may use it exploring the library or for testing purposes.
 1. Your application is now up and running.
