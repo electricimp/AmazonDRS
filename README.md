@@ -139,6 +139,51 @@ client.setRefreshToken(AMAZON_DRS_REFRESH_TOKEN);
 
 The method returns a string with the `Refresh Token` or `null` if it is not set.
 
+#### Example ####
+
+```
+#require "Rocky.class.nut:2.0.1"
+#require "AmazonDRS.agent.lib.nut:1.0.0"
+
+const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
+const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
+const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
+const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
+
+function getStoredRefreshToken() {
+    local persist = server.load();
+    local amazonDRS = {};
+    if ("amazonDRS" in persist) amazonDRS = persist.amazonDRS;
+
+    // Load credentials if we have them
+    if ("refreshToken" in amazonDRS) {
+        client.setRefreshToken(amazonDRS.refreshToken);
+        server.log("Refresh Token found!");
+        return true;
+    }
+    return false;
+}
+
+client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
+
+if (!getStoredRefreshToken()) {
+    function onAuthenticated(error, response) {
+        if (error != 0) {
+            server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
+            return;
+        }
+        local persist = server.load();
+        persist.amazonDRS <- { "refreshToken" : client.getRefreshToken() };
+        server.save(persist);
+        server.log("Successfully authenticated!");
+        server.log("Refresh Token saved!");
+    }
+    
+    local testDevice = true;
+    client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+}
+```
+
 ### replenish(*slotId[, onReplenished]*) ###
 
 This method places an order for a device/slot combination. For more information, please see [the Amazon DRS documentation](https://developer.amazon.com/docs/dash/replenish-endpoint.html).
