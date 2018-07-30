@@ -5,8 +5,8 @@ This document describes the example applications provided with the [AmazonDRS li
 ## Replenish example ##
 
 The example:
-- authenticates the device on Amazon platform using the provided Client ID and Client Secret
-- executes the following cycle: places an order, waits for 8 sec, cancels the order, waits for 12 sec
+- authenticates the device on Amazon platform using the library's [login()](../README.md#logindevicemodel-deviceserial-onauthenticated-testdevice) method which provides the authentication flow described [here](../README.md#authentication)
+- executes the following cycle: places a test order, waits for 8 sec, cancels the order, waits for 12 sec
 - logs all responses received from the Amazon DRS
 
 Source code: [Replenish.agent.nut](./Replenish.agent.nut)
