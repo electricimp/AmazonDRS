@@ -113,6 +113,9 @@ class AmazonDRS {
     //
     // Returns:                         Nothing.
     function setRefreshToken(refreshToken) {
+        // Invalidate the existing Access Token
+        _accessToken = null;
+        _accessTokenExpiration = 0;
         _refreshToken = refreshToken;
     }
 
