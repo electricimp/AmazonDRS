@@ -82,7 +82,7 @@ This stage is used to authenticate the imp application in Amazon.
     1. Click the agent URL in impCentral.
 ![In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging](images/Run.png "In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging")
     1. You will be redirected to the login page.
-    1. Log into Amazon *on that page* and go through the suggested setup steps.
+    1. Log into Amazon *on that page* and go through the suggested setup steps. Amazon may ask you to enter your address, credit card information, etc. Press the **Complete Setup** button to finish the setup process.
     ![Go through the suggested setup steps](images/AmazonSetup.png "Go through the suggested setup steps")
     1. After that the page should display **Authentication complete - you may now close this window**.
     1. Close that page and return to impCentral.
