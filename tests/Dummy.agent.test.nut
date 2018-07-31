@@ -50,10 +50,10 @@ class DummyTestCase extends ImpTestCase {
         return Promise(function (resolve, reject) {
             _amazonDRSClient.login("deviceModel", "deviceSerial");
             local onAuth = function (err, response) {
-                if (err == AMAZON_DRS_ERROR_AUTH_STARTED_ALREADY) {
+                if (err == AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED) {
                     return resolve();
                 }
-                return reject("AMAZON_DRS_ERROR_AUTH_STARTED_ALREADY error was expected!");
+                return reject("AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED error was expected!");
             }.bindenv(this);
             _amazonDRSClient.login("deviceModel", "deviceSerial", onAuth);
         }.bindenv(this));

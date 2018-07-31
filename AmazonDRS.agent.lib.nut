@@ -31,7 +31,7 @@ rocky <- null;
 
 // Error codes
 const AMAZON_DRS_ERROR_NOT_AUTHENTICATED    = 1000;
-const AMAZON_DRS_ERROR_AUTH_STARTED_ALREADY = 1001;
+const AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED = 1001;
 const AMAZON_DRS_ERROR_GENERAL              = 1010;
 
 class AmazonDRS {
@@ -86,7 +86,7 @@ class AmazonDRS {
     // Returns:                         Nothing.
     function login(deviceModel, deviceSerial, onAuthenticated = null, testDevice = false) {
         if (_loginEnabled) {
-            onAuthenticated && onAuthenticated(AMAZON_DRS_ERROR_AUTH_STARTED_ALREADY, null);
+            onAuthenticated && onAuthenticated(AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED, null);
             return;
         }
 
