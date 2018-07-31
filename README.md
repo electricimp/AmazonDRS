@@ -19,23 +19,25 @@ Before using the library you need to have:
 
 - An Amazon Developer account
 - [Client ID and Secret of your LWA Security Profile](https://developer.amazon.com/docs/dash/create-a-security-profile.html)
-- [A DRS device](https://developer.amazon.com/dash-replenishment/drs_console.html)
+- [A DRS device](https://developer.amazon.com/dash-replenishment/drs_console.html) (account is required)
 
 ### Authentication ###
 
 This library needs a `Refresh Token` to be able to call the Amazon's DRS API.
 The `Refresh Token` can be acquired with the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method. Also, it can be acquired with any other application-specific way and then passed in with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method.
 
+Every time you call the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method or the [setRefreshToken()](#setrefreshtokenrefreshtoken) method and this call finishes the library starts to use new `Refresh Token`.
+
 The [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method provides the following authentication flow:
-1. a user opens the agent's URL in a browser
-1. the library handles this request and redirects the user to the Amazon login page or to the Amazon device's settings page if the user is already logged in
-1. the user sets up the device in the Amazon's UI
-1. the Amazon's LWA redirects the user back to the agent's URL with an authorization code
-1. the agent receives this code and acquires security tokens (`Refresh Token` and `Access Token`)
+1. A user opens the agent's URL in a browser
+1. The library handles this request and redirects the user to the Amazon login page or to the Amazon device's settings page if the user is already logged in
+1. The user sets up the device in the Amazon's UI
+1. The Amazon's LWA redirects the user back to the agent's URL with an authorization code
+1. The agent receives this code and acquires security tokens (`Refresh Token` and `Access Token`)
 
 More about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-api.html) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html).
 
-**Note**: After each restart of the agent the `Refresh Token` should be passed in to the library. So if you don't want to go through the authentication steps again, you may save the token in the agent's persistent storage and set it with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method after each restart of the agent.
+**Note**: After each restart of the agent the `Refresh Token` should be passed in to the library. So if you don't want to go through the authentication steps again, you may save the token in the agent's persistent storage and set it with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method after each restart of the agent. See [the provided example](#example-store-and-load-refresh-token).
 
 ### Test Orders ###
 
@@ -63,6 +65,8 @@ This method returns a new AmazonDRS instance.
 
 This method allows to authenticate the agent on the Amazon and get required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call the [setRefreshToken()](#setrefreshtokenrefreshtoken) method. For more information, please read about [authentication](#authentication). 
 
+You may call this method again only after the previous call has finished. The call is considered as finished only when the authentication flow described in the [authentication](#authentication) section is completed or an error occured.
+
 Either this method or [setRefreshToken()](#setrefreshtokenrefreshtoken) should be called and authentication should be done before making any DRS-related requests.
 
 **If you are going to use this method, please add** `#require "Rocky.class.nut:2.0.1"` **to the top of your agent code.**
@@ -73,7 +77,7 @@ If the **Rocky** library is not included, the method will throw an exception.
 | --- | --- | --- | --- |
 | *deviceModel* | String | Yes | `Device Model`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
 | *deviceSerial* | String | Yes | `Device Serial`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
-| *onAuthenticated* | Function | Optional | Callback called when the operation is completed or an error happens. |
+| *onAuthenticated* | Function | Optional | Callback called when the operation is completed or an error occurs. |
 | *testDevice* | Boolean | Optional | `True` if it is a test device. `False` by default. For more information, please see [here](https://developer.amazon.com/docs/dash/test-device-purchases.html) and the [Test Orders section](#test-orders). |
 
 The method returns nothing. A result of the operation may be obtained via the [onAuthenticated](#callback-onauthenticatederror-response) callback if specified in this method.
@@ -139,51 +143,6 @@ client.setRefreshToken(AMAZON_DRS_REFRESH_TOKEN);
 
 The method returns a string with the `Refresh Token` or `null` if it is not set.
 
-#### Example ####
-
-```
-#require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.0.0"
-
-const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
-const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
-const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
-const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
-
-function getStoredRefreshToken() {
-    local persist = server.load();
-    local amazonDRS = {};
-    if ("amazonDRS" in persist) amazonDRS = persist.amazonDRS;
-
-    // Load credentials if we have them
-    if ("refreshToken" in amazonDRS) {
-        client.setRefreshToken(amazonDRS.refreshToken);
-        server.log("Refresh Token found!");
-        return true;
-    }
-    return false;
-}
-
-client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
-
-if (!getStoredRefreshToken()) {
-    function onAuthenticated(error, response) {
-        if (error != 0) {
-            server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
-            return;
-        }
-        local persist = server.load();
-        persist.amazonDRS <- { "refreshToken" : client.getRefreshToken() };
-        server.save(persist);
-        server.log("Successfully authenticated!");
-        server.log("Refresh Token saved!");
-    }
-    
-    local testDevice = true;
-    client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
-}
-```
-
 ### replenish(*slotId[, onReplenished]*) ###
 
 This method places an order for a device/slot combination. For more information, please see [the Amazon DRS documentation](https://developer.amazon.com/docs/dash/replenish-endpoint.html).
@@ -191,7 +150,7 @@ This method places an order for a device/slot combination. For more information,
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
 | *slotId* | String | Yes | ID of a slot to place an order for it. |
-| *onReplenished* | Function | Optional | Callback called when the operation is completed or an error happens. |
+| *onReplenished* | Function | Optional | Callback called when the operation is completed or an error occurs. |
 
 The method returns nothing. A result of the operation may be obtained via the [onReplenished](#callback-onreplenishederror-response) callback if specified in this method.
 
@@ -228,7 +187,7 @@ The method can only be used for the orders made by a test device ([a device auth
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
 | *slotId* | String | Optional | ID of a slot to be canceled. If is `null` or not specified, test orders for all slots in the device will be canceled. |
-| *onCanceled* | Function | Optional | Callback called when the operation is completed or an error happens. |
+| *onCanceled* | Function | Optional | Callback called when the operation is completed or an error occurs. |
 
 The method returns nothing. A result of the operation may be obtained via the [onCanceled](#callback-oncancelederror-response) callback if specified in this method.
 
@@ -263,7 +222,7 @@ This method enables (*value* is `true`) or disables (*value* is `false`) the lib
 
 ### Error code ###
 
-An *Integer* error code which specifies a concrete error (if any) happened during an operation.
+An *Integer* error code which specifies a concrete error (if any) occured during an operation.
 
 | Error Code | Description |
 | --- | --- |
@@ -271,12 +230,64 @@ An *Integer* error code which specifies a concrete error (if any) happened durin
 | 1-99 | [Internal errors of the HTTP API](https://developer.electricimp.com/api/httprequest/sendasync). |
 | 100-999 | HTTP error codes from Amazon server. See methods' descriptions for more information. |
 | 1000 | The client is not authenticated. E.g. `Refresh Token` is invalid or not set. |
-| 1001 | The authentication process is already started. |
+| 1001 | The [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method is already called. |
 | 1010 | General error. |
 
 ## Examples ##
 
 Working examples are provided in the [examples](./examples) directory and described [here](./examples/README.md).
+
+The following example shows proper usage of login(), setRefreshToken() and getRefreshToken() methods. It saves the `Refresh Token` in server-side persistent storage and then loads it to the library on each restart of the agent. Thus the user does not have to set up the device every time.
+
+### Example: Store And Load Refresh Token ###
+
+```
+#require "Rocky.class.nut:2.0.1"
+#require "AmazonDRS.agent.lib.nut:1.0.0"
+
+const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
+const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
+const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
+const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
+
+function getStoredRefreshToken() {
+    local persist = server.load();
+    local amazonDRS = {};
+    if ("amazonDRS" in persist) {
+        amazonDRS = persist.amazonDRS;
+    }
+    if ("refreshToken" in amazonDRS) {
+        server.log("Refresh Token found!");
+        return amazonDRS.refreshToken;
+    }
+    return null;
+}
+
+client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
+
+refreshToken <- getStoredRefreshToken();
+if (refreshToken != null) {
+    client.setRefreshToken(refreshToken);
+} else {
+    function onAuthenticated(error, response) {
+        if (error != 0) {
+            server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
+            return;
+        }
+        refreshToken = client.getRefreshToken();
+        client.setRefreshToken(refreshToken);
+        local persist = server.load();
+        persist.amazonDRS <- { "refreshToken" : refreshToken };
+        server.save(persist);
+        server.log("Successfully authenticated!");
+        server.log("Refresh Token saved!");
+    }
+    
+    local testDevice = true;
+    client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+    server.log("Log in please!");
+}
+```
 
 ## Testing ##
 
@@ -284,4 +295,4 @@ Tests for the library are provided in the [tests](./tests) directory and describ
 
 ## License ##
 
-The AmazonDRS library is licensed under the [MIT License](./LICENSE)
+The AmazonDRS library is licensed under the [MIT License](./LICENSE).
