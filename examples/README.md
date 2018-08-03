@@ -84,7 +84,7 @@ This stage is used to authenticate the imp application in Amazon.
 
 ### Build and Run the Electric Imp Application ###
 
-1. Click **Build & Run All** to syntax-check, compile and deploy the code.
+1. Click **Build and Force Restart** to syntax-check, compile and deploy the code.
 1. On the log pane, you should see **Log in please** message. This example uses OAuth 2.0 for authentication, and the agent has been set up as a web server to handle the authentication procedure.
     1. Click the agent URL in impCentral.
 ![In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging](images/Run.png "In impCentral, click the Build and Run All button to compile and deploy the application and begin device and agent logging")
