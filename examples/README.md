@@ -5,9 +5,9 @@ This document describes the example applications provided with the [AmazonDRS li
 ## Replenish example ##
 
 The example:
-- authenticates the device on Amazon platform using the library's [login()](../README.md#logindevicemodel-deviceserial-onauthenticated-testdevice) method which provides the authentication flow described [here](../README.md#authentication)
-- executes the following cycle: places a test order, waits for 8 sec, cancels the order, waits for 12 sec
-- logs all responses received from the Amazon DRS
+- Authenticates the device on Amazon platform using the library's [login()](../README.md#logindevicemodel-deviceserial-onauthenticated-testdevice) method which provides the authentication flow described [here](../README.md#authentication)
+- Executes the following cycle: places a test order, waits for 8 sec, cancels the order, waits for 12 sec
+- Logs all responses received from the Amazon DRS
 
 Source code: [Replenish.agent.nut](./Replenish.agent.nut)
 
@@ -58,6 +58,12 @@ This stage is used to authenticate the imp application in Amazon.
 
 1. In the [Amazon Developer Console](https://developer.amazon.com/home.html), click the **APPS & SERVICES** tab and choose **Dash Replenishment Service**.
 ![Open Dash Replenishment Service](images/DRS.png "Open Dash Replenishment Service")
+1. If you open **Dash Replenishment Service** for the first time, Amazon may take you to **Dash Replenishment Account Setup**:
+![Dash Replenishment Account Setup](images/DRSSetup.png "Dash Replenishment Account Setup")
+    1. Click **Begin**
+    1. Choose your `example_sp` **Security Profile**
+![Choose your Security Profile](images/DRSSetupSP.png "Choose your Security Profile")
+    1. Click **Next** several times and then click **Done**
 1. Click the **CREATE A DEVICE** button.
 1. In the appeared window, fill in the fields:
     1. **Name**: `example_device`
