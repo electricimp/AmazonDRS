@@ -65,6 +65,7 @@ This stage is used to authenticate the imp application in Amazon.
 ![Choose your Security Profile](images/DRSSetupSP.png "Choose your Security Profile")
     1. Click **Next** several times and then click **Done**
 1. Click the **CREATE A DEVICE** button.
+![Click the CREATE A DEVICE button](images/DRSCreate.png "Click the CREATE A DEVICE button")
 1. In the appeared window, fill in the fields:
     1. **Name**: `example_device`
     2. **Model ID**: `example_model`
