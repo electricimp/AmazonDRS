@@ -37,6 +37,7 @@ const REPLENISH_DELAY = 12;
 
 class ReplenishExample {
     _amazonDRSClient = null;
+    _rocky = null;
 
     _deviceModel = null;
     _deviceSerial = null;
@@ -44,6 +45,7 @@ class ReplenishExample {
 
     constructor(clientId, clientSecret, deviceModel, deviceSerial, slotId) {
         _amazonDRSClient = AmazonDRS(clientId, clientSecret);
+        _rocky = Rocky();
         _deviceModel = deviceModel;
         _deviceSerial = deviceSerial;
         _slotId = slotId;
@@ -51,7 +53,7 @@ class ReplenishExample {
 
     function start() {
         local testDevice = true;
-        _amazonDRSClient.login(_deviceModel, _deviceSerial, onAuthenticated.bindenv(this), testDevice);
+        _amazonDRSClient.login(_rocky, _deviceModel, _deviceSerial, onAuthenticated.bindenv(this), testDevice);
     }
 
     function onAuthenticated(error, response) {

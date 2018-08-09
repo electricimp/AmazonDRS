@@ -25,10 +25,6 @@
 
 // AmazonDRS is an Electric Imp agent-side library for interfacing with the Amazon Dash Replenishment Service via the RESTful API.
 
-// NOTE: DON'T CREATE TWO INSTANCES OF ROCKY
-// TODO: Is it ok to make it global?
-rocky <- null;
-
 // Error codes
 const AMAZON_DRS_ERROR_NOT_AUTHENTICATED    = 1000;
 const AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED = 1001;
@@ -73,6 +69,7 @@ class AmazonDRS {
     // The method automatically sets the obtained tokens to be used for DRS API calls.
     //
     // Parameters:
+    //     rocky : Rocky                An instance of Rocky.
     //     deviceModel : String         Device Model.
     //     deviceSerial : String        Device Serial.
     //     onAuthenticated : Function   Callback called when the operation is completed or an error happens.
@@ -84,26 +81,20 @@ class AmazonDRS {
     //          (optional)
     //
     // Returns:                         Nothing.
-    function login(deviceModel, deviceSerial, onAuthenticated = null, testDevice = false) {
+    function login(rocky, deviceModel, deviceSerial, onAuthenticated = null, testDevice = false) {
         if (_loginEnabled) {
             onAuthenticated && onAuthenticated(AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED, null);
             return;
         }
 
-        if ("Rocky" in getroottable() && rocky == null) {
-            rocky = Rocky();
-        } else if (!("Rocky" in getroottable())) {
-            throw "Unmet dependency: AmazonDRS.login() requires Rocky";
-        }
-
         local authDone = function (error, resp) {
             _loginEnabled = false;
-            _undefineLoginEndpoint();
+            _undefineLoginEndpoint(rocky);
             onAuthenticated && onAuthenticated(error, resp);
         }.bindenv(this);
 
         _loginEnabled = true;
-        _defineLoginEndpoint(deviceModel, deviceSerial, testDevice, authDone);
+        _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, authDone);
     }
 
     // Allows to set a Refresh Token manually.
@@ -138,7 +129,6 @@ class AmazonDRS {
     //
     // Returns:                         Nothing.
     function replenish(slotId, onReplenished = null) {
-        // TODO: Can we make concurrent requests? With a valid access_token, I think, yes. But what if the token is expired?
         if (_refreshToken == null) {
             _logError("Refresh token is not set!");
             onReplenished && onReplenished(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, null);
@@ -147,32 +137,18 @@ class AmazonDRS {
         if (_isAccessTokenExpired()) {
             _log("Access token is expired");
             local onRefreshed = function (err, respBody) {
-                if (err != 0) {
+                if (err != 0 || _isAccessTokenExpired()) {
                     onReplenished && onReplenished(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, respBody);
-                    return;
+                } else {
+                    _requestReplenish(slotId, onReplenished);
                 }
-
-                // TODO: Should we make some defense from infinite recursion?
-                replenish(slotId, onReplenished);
             }.bindenv(this);
 
             _refreshAccessToken(onRefreshed);
             return;
         }
 
-        local headers = {
-            "Authorization" : "Bearer " + _accessToken,
-            "x-amzn-accept-type" : "com.amazon.dash.replenishment.DrsReplenishResult@1.0",
-            "x-amzn-type-version" : "com.amazon.dash.replenishment.DrsReplenishInput@1.0"
-        };
-
-        local req = http.post(REPLENISH_ENDPOINT + slotId, headers, "");
-
-        local sent = function (resp) {
-            _onSent(resp, onReplenished);
-        }.bindenv(this);
-
-        req.sendasync(sent);
+        _requestReplenish(slotId, onReplenished);
     }
 
     // Cancels test orders for one or all slots in the device.
@@ -188,7 +164,6 @@ class AmazonDRS {
     //
     // Returns:                         Nothing.
     function cancelTestOrder(slotId = null, onCanceled = null) {
-        // TODO: Can we make concurrent requests? With a valid access_token, I think, yes. But what if the token is expired?
         if (_refreshToken == null) {
             onCanceled && onCanceled(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, null);
             return;
@@ -196,19 +171,49 @@ class AmazonDRS {
         if (_isAccessTokenExpired()) {
             _log("Access token is expired");
             local onRefreshed = function (err, respBody) {
-                if (err != 0) {
+                if (err != 0 || _isAccessTokenExpired()) {
                     onCanceled && onCanceled(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, respBody);
-                    return;
+                } else {
+                    _requestCancelOrder(slotId, onCanceled);
                 }
-
-                // TODO: Should we make some defense from infinite recursion?
-                cancelTestOrder(slotId, onCanceled);
             }.bindenv(this);
 
             _refreshAccessToken(onRefreshed);
             return;
         }
 
+        _requestCancelOrder(slotId, onCanceled);
+    }
+
+    // Enables or disables the client debug output. Disabled by default.
+    //
+    // Parameters:
+    //     value : Boolean              true to enable, false to disable
+    //
+    // Returns:                         Nothing.
+    function setDebug(value) {
+        _debugEnabled = value;
+    }
+
+    // -------------------- PRIVATE METHODS -------------------- //
+
+    function _requestReplenish(slotId, onReplenished) {
+        local headers = {
+            "Authorization" : "Bearer " + _accessToken,
+            "x-amzn-accept-type" : "com.amazon.dash.replenishment.DrsReplenishResult@1.0",
+            "x-amzn-type-version" : "com.amazon.dash.replenishment.DrsReplenishInput@1.0"
+        };
+
+        local req = http.post(REPLENISH_ENDPOINT + slotId, headers, "");
+
+        local sent = function (resp) {
+            _onSent(resp, onReplenished);
+        }.bindenv(this);
+
+        req.sendasync(sent);
+    }
+
+    function _requestCancelOrder(slotId, onCanceled) {
         local headers = {
             "Authorization" : "Bearer " + _accessToken,
             "x-amzn-accept-type" : "com.amazon.dash.replenishment.DrsCancelTestOrdersResult@1.0",
@@ -230,19 +235,7 @@ class AmazonDRS {
         req.sendasync(sent);
     }
 
-    // Enables or disables the client debug output. Disabled by default.
-    //
-    // Parameters:
-    //     value : Boolean              true to enable, false to disable
-    //
-    // Returns:                         Nothing.
-    function setDebug(value) {
-        _debugEnabled = value;
-    }
-
-    // -------------------- PRIVATE METHODS -------------------- //
-
-    function _defineLoginEndpoint(deviceModel, deviceSerial, testDevice, callback) {
+    function _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, callback) {
         // Define login endpoint for GET requests to the agent URL
         rocky.get(LOGIN_ENDPOINT, function(context) {
             if ("error" in context.req.query) {
@@ -267,8 +260,7 @@ class AmazonDRS {
         }.bindenv(this));
     }
 
-    function _undefineLoginEndpoint() {
-        // TODO: How to properly undefine the endpoint?
+    function _undefineLoginEndpoint(rocky) {
         rocky.get(LOGIN_ENDPOINT, function(context) {
             context.send(503, "Authentication is finished. You may reactivate it with login() method.");
         }.bindenv(this));

@@ -27,35 +27,37 @@
 
 class DummyTestCase extends ImpTestCase {
     _amazonDRSClient = null;
+    _rocky = null;
 
     function setUp() {
         _amazonDRSClient = AmazonDRS("clientId", "clientSecret");
+        _rocky = Rocky();
     }
 
     function testLogin1() {
-        _amazonDRSClient.login("deviceModel", "deviceSerial");
+        _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial");
     }
 
     function testLogin2() {
         local onAuth = function (err, response) { };
-        _amazonDRSClient.login("deviceModel", "deviceSerial", onAuth);
+        _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth);
     }
 
     function testLogin3() {
         local onAuth = function (err, response) { };
-        _amazonDRSClient.login("deviceModel", "deviceSerial", onAuth, true);
+        _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth, true);
     }
 
     function testLoginLogin() {
         return Promise(function (resolve, reject) {
-            _amazonDRSClient.login("deviceModel", "deviceSerial");
+            _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial");
             local onAuth = function (err, response) {
                 if (err == AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED) {
                     return resolve();
                 }
                 return reject("AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED error was expected!");
             }.bindenv(this);
-            _amazonDRSClient.login("deviceModel", "deviceSerial", onAuth);
+            _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth);
         }.bindenv(this));
     }
 
