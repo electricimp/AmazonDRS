@@ -24,11 +24,11 @@ Before using the library you need to have:
 ### Authentication ###
 
 This library needs a `Refresh Token` to be able to call the Amazon's DRS API.
-The `Refresh Token` can be acquired with the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method. Also, it can be acquired with any other application-specific way and then passed in with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method.
+The `Refresh Token` can be acquired with the [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) method. Also, it can be acquired with any other application-specific way and then passed in with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method.
 
-Every time you call the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method or the [setRefreshToken()](#setrefreshtokenrefreshtoken) method and this call finishes the library starts to use new `Refresh Token`.
+Every time you call the [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) method or the [setRefreshToken()](#setrefreshtokenrefreshtoken) method and this call finishes the library starts to use new `Refresh Token`.
 
-The [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method provides the following authentication flow:
+The [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) method provides the following authentication flow:
 1. A user opens the agent's URL in a browser
 1. The library handles this request and redirects the user to the Amazon login page or to the Amazon device's settings page if the user is already logged in
 1. The user sets up the device in the Amazon's UI
@@ -42,7 +42,7 @@ More about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-
 ### Test Orders ###
 
 For testing purposes, Amazon DRS allows making [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those that made by a DRS device authenticated as a test device. So it is determined at the step of authentication whether the device is for testing or not.
-Due to this the [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
+Due to this the [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) method has a parameter *testDevice*. But if you set a `Refresh Token` manually with the [setRefreshToken()](#setrefreshtokenrefreshtoken) method, only you know whether this token was obtained for testing or not and such *testDevice* parameter is not required here.
 
 Only test orders can be canceled with the [cancelTestOrder()](#canceltestorderslotid-oncanceled) method.
 
@@ -61,7 +61,7 @@ This method returns a new AmazonDRS instance.
 | *clientId* | String | Yes | `Client ID` of your LWA Security Profile. For information, please see [here](https://developer.amazon.com/docs/login-with-amazon/glossary.html#client_identifier). |
 | *clientSecret* | String | Yes | `Client Secret` of your LWA Security Profile. For information, please see [here](https://developer.amazon.com/docs/login-with-amazon/glossary.html#client_secret). |
 
-### login(*deviceModel, deviceSerial[, onAuthenticated[, testDevice]]*) ###
+### login(*rocky, deviceModel, deviceSerial[, onAuthenticated[, testDevice]]*) ###
 
 This method allows to authenticate the agent on the Amazon and get required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call the [setRefreshToken()](#setrefreshtokenrefreshtoken) method. For more information, please read about [authentication](#authentication). 
 
@@ -69,12 +69,11 @@ You may call this method again only after the previous call has finished. The ca
 
 Either this method or [setRefreshToken()](#setrefreshtokenrefreshtoken) should be called and authentication should be done before making any DRS-related requests.
 
-**If you are going to use this method, please add** `#require "Rocky.class.nut:2.0.1"` **to the top of your agent code.**
-
-If the **Rocky** library is not included, the method will throw an exception.
+This method uses the [Rocky library](https://github.com/electricimp/Rocky), so it requires an instance of Rocky to be passed in.
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
+| *rocky* | [Rocky](https://github.com/electricimp/Rocky) | Yes | An instance of [Rocky](https://github.com/electricimp/Rocky). |
 | *deviceModel* | String | Yes | `Device Model`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
 | *deviceSerial* | String | Yes | `Device Serial`. For information, please see [here](https://developer.amazon.com/docs/dash/lwa-web-api.html#integrate-with-the-lwa-sdk-for-javascript). |
 | *onAuthenticated* | Function | Optional | Callback called when the operation is completed or an error occurs. |
@@ -111,14 +110,15 @@ function onAuthenticated(error, response) {
 }
 
 client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
-client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+rocky <- Rocky();
+client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
 ```
 
 ### setRefreshToken(*refreshToken*) ###
 
 This method allows setting a `Refresh Token` manually. For more information, please read about [authentication](#authentication). 
 
-Either this method or [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) should be called and authentication should be done before making any DRS-related requests.
+Either this method or [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) should be called and authentication should be done before making any DRS-related requests.
 
 | Parameter | Data Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -230,14 +230,14 @@ An *Integer* error code which specifies a concrete error (if any) occured during
 | 1-99 | [Internal errors of the HTTP API](https://developer.electricimp.com/api/httprequest/sendasync). |
 | 100-999 | HTTP error codes from Amazon server. See methods' descriptions for more information. |
 | 1000 | The client is not authenticated. E.g. `Refresh Token` is invalid or not set. |
-| 1001 | The [login()](#logindevicemodel-deviceserial-onauthenticated-testdevice) method is already called. |
+| 1001 | The [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice) method is already called. |
 | 1010 | General error. |
 
 ## Examples ##
 
 Working examples are provided in the [examples](./examples) directory and described [here](./examples/README.md).
 
-The following example shows proper usage of login(), setRefreshToken() and getRefreshToken() methods. It saves the `Refresh Token` in server-side persistent storage and then loads it to the library on each restart of the agent. Thus the user does not have to set up the device every time.
+The following example shows proper usage of [login()](#loginrocky-devicemodel-deviceserial-onauthenticated-testdevice), [setRefreshToken()](#setrefreshtokenrefreshtoken) and [getRefreshToken()](#getrefreshtoken) methods. It saves the `Refresh Token` in server-side persistent storage and then loads it to the library on each restart of the agent. Thus the user does not have to set up the device every time.
 
 ### Example: Store And Load Refresh Token ###
 
@@ -284,7 +284,8 @@ if (refreshToken != null) {
     }
     
     local testDevice = true;
-    client.login(AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+    rocky <- Rocky();
+    client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
     server.log("Log in please!");
 }
 ```
