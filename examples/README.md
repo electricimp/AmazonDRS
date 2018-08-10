@@ -9,6 +9,8 @@ The example:
 - Executes the following cycle: places a test order, waits for 8 sec, cancels the order, waits for 12 sec
 - Logs all responses received from the Amazon DRS
 
+**Please note that this example is not production-oriented at least due to the necessity of exposing agent's URL.**
+
 Source code: [Replenish.agent.nut](./Replenish.agent.nut)
 
 ## Example Setup and Run ##
