@@ -129,26 +129,7 @@ class AmazonDRS {
     //
     // Returns:                         Nothing.
     function replenish(slotId, onReplenished = null) {
-        if (_refreshToken == null) {
-            _logError("Refresh token is not set!");
-            onReplenished && onReplenished(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, null);
-            return;
-        }
-        if (_isAccessTokenExpired()) {
-            _log("Access token is expired");
-            local onRefreshed = function (err, respBody) {
-                if (err != 0 || _isAccessTokenExpired()) {
-                    onReplenished && onReplenished(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, respBody);
-                } else {
-                    _requestReplenish(slotId, onReplenished);
-                }
-            }.bindenv(this);
-
-            _refreshAccessToken(onRefreshed);
-            return;
-        }
-
-        _requestReplenish(slotId, onReplenished);
+        _prepareRequest(_requestReplenish, slotId, onReplenished);
     }
 
     // Cancels test orders for one or all slots in the device.
@@ -164,25 +145,7 @@ class AmazonDRS {
     //
     // Returns:                         Nothing.
     function cancelTestOrder(slotId = null, onCanceled = null) {
-        if (_refreshToken == null) {
-            onCanceled && onCanceled(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, null);
-            return;
-        }
-        if (_isAccessTokenExpired()) {
-            _log("Access token is expired");
-            local onRefreshed = function (err, respBody) {
-                if (err != 0 || _isAccessTokenExpired()) {
-                    onCanceled && onCanceled(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, respBody);
-                } else {
-                    _requestCancelOrder(slotId, onCanceled);
-                }
-            }.bindenv(this);
-
-            _refreshAccessToken(onRefreshed);
-            return;
-        }
-
-        _requestCancelOrder(slotId, onCanceled);
+        _prepareRequest(_requestCancelOrder, slotId, onCanceled);
     }
 
     // Enables or disables the client debug output. Disabled by default.
@@ -196,6 +159,29 @@ class AmazonDRS {
     }
 
     // -------------------- PRIVATE METHODS -------------------- //
+
+    function _prepareRequest(doRequest, slotId, onDone = null) {
+        if (_refreshToken == null) {
+            _logError("Refresh token is not set!");
+            onDone && onDone(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, null);
+            return;
+        }
+        if (_isAccessTokenExpired()) {
+            _log("Access token is expired");
+            local onRefreshed = function (err, respBody) {
+                if (err != 0 || _isAccessTokenExpired()) {
+                    onDone && onDone(AMAZON_DRS_ERROR_NOT_AUTHENTICATED, respBody);
+                } else {
+                    doRequest(slotId, onDone);
+                }
+            }.bindenv(this);
+
+            _refreshAccessToken(onRefreshed);
+            return;
+        }
+
+        doRequest(slotId, onDone);
+    }
 
     function _requestReplenish(slotId, onReplenished) {
         local headers = {
