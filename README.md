@@ -102,6 +102,7 @@ const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
 const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
 
 testDevice <- true;
+loginRoute <- "/login";
 
 function onAuthenticated(error, response) {
     if (error != 0) {
@@ -113,7 +114,7 @@ function onAuthenticated(error, response) {
 
 client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
 rocky <- Rocky();
-client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), loginRoute, testDevice);
 ```
 
 ### setRefreshToken(*refreshToken*) ###
@@ -287,7 +288,7 @@ if (refreshToken != null) {
     
     local testDevice = true;
     rocky <- Rocky();
-    client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), testDevice);
+    client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), null, testDevice);
     server.log("Log in please!");
 }
 ```
