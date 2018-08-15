@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/electricimp/AmazonDRS.svg?branch=master)](https://travis-ci.org/electricimp/AmazonDRS)
+
 # AmazonDRS #
 
 This library allows your agent code to work with the [Amazon Dash Replenishment Service](https://developer.amazon.com/dash-replenishment-service) via the [RESTful API](https://developer.amazon.com/docs/dash/replenish-endpoint.html).
