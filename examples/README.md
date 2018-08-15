@@ -23,7 +23,7 @@ If you are not registered as a developer, create a developer's account.
 ### Set Up Imp Device ###
 
 1. [Set up a device](https://developer.electricimp.com/gettingstarted)
-1. In the [Electric Imp's IDE](https://ide.electricimp.com) create new Product and Development Device Group.
+1. In the [Electric Imp's IDE](https://impcentral.electricimp.com) create new Product and Development Device Group.
 1. Assign the device to the newly created Device Group.
 1. Copy the [Replenish example source code](./Replenish.agent.nut) and paste it into the IDE as the agent code.
 1. Make a note of the agent's URL. It will be required for the next steps.
