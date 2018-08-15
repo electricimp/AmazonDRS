@@ -57,7 +57,7 @@ class DummyTestCase extends ImpTestCase {
                 }
                 return reject("AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED error was expected!");
             }.bindenv(this);
-            _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth);
+            _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth, "/login");
         }.bindenv(this));
     }
 

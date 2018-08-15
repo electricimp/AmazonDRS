@@ -35,6 +35,7 @@ class AmazonDRS {
     _debugEnabled = false;
 
     _loginEnabled = false;
+    _loginRoute = null;
 
     _clientId = null;
     _clientSecret = null;
@@ -57,7 +58,7 @@ class AmazonDRS {
         const REPLENISH_ENDPOINT = "https://dash-replenishment-service-na.amazon.com/replenish/";
         const CANCEL_ALL_TEST_ORDERS_ENDPOINT = "https://dash-replenishment-service-na.amazon.com/testOrders";
         const CANCEL_TEST_ORDER_ENDPOINT = "https://dash-replenishment-service-na.amazon.com/testOrders/slots/";
-        const LOGIN_ENDPOINT = "/";
+        const DEFAULT_LOGIN_ROUTE = "/";
         const LWA_ENDPOINT = "https://www.amazon.com/ap/oa";
         const OAUTH_TOKEN_ENDPOINT = "https://api.amazon.com/auth/o2/token";
 
@@ -72,6 +73,8 @@ class AmazonDRS {
     //     rocky : Rocky                An instance of Rocky.
     //     deviceModel : String         Device Model.
     //     deviceSerial : String        Device Serial.
+    //     route : String               Login endpoint's route.
+    //          (optional)
     //     onAuthenticated : Function   Callback called when the operation is completed or an error happens.
     //          (optional)              The callback signature:
     //                                  onAuthenticated(error, response), where
@@ -81,11 +84,13 @@ class AmazonDRS {
     //          (optional)
     //
     // Returns:                         Nothing.
-    function login(rocky, deviceModel, deviceSerial, onAuthenticated = null, testDevice = false) {
+    function login(rocky, deviceModel, deviceSerial, onAuthenticated = null, route = null, testDevice = false) {
         if (_loginEnabled) {
             onAuthenticated && onAuthenticated(AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED, null);
             return;
         }
+
+        _loginRoute = route != null ? route : DEFAULT_LOGIN_ROUTE;
 
         local authDone = function (error, resp) {
             _loginEnabled = false;
@@ -223,7 +228,7 @@ class AmazonDRS {
 
     function _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, callback) {
         // Define login endpoint for GET requests to the agent URL
-        rocky.get(LOGIN_ENDPOINT, function(context) {
+        rocky.get(_loginRoute, function(context) {
             if ("error" in context.req.query) {
                 callback && callback(AMAZON_DRS_ERROR_GENERAL, context.req.query)
                 context.send(500, "Error: " + http.jsonencode(context.req.query));
@@ -247,7 +252,7 @@ class AmazonDRS {
     }
 
     function _undefineLoginEndpoint(rocky) {
-        rocky.get(LOGIN_ENDPOINT, function(context) {
+        rocky.get(_loginRoute, function(context) {
             context.send(503, "Authentication is finished. You may reactivate it with login() method.");
         }.bindenv(this));
     }
@@ -291,12 +296,20 @@ class AmazonDRS {
                 }
             }),
             "response_type" : "code",
-            "redirect_uri" : http.agenturl()
+            "redirect_uri" : _getRedirectUri()
         };
         location += "?" + http.urlencode(params);
         context.setHeader("Location", location);
         context.send(302, "Found");
         _log("User has been redirected to the Amazon's setup page");
+    }
+
+    function _getRedirectUri() {
+        // We don't want to have '/' at the end of redirect_uri
+        if (_loginRoute == DEFAULT_LOGIN_ROUTE) {
+            return http.agenturl();
+        }
+        return http.agenturl() + _loginRoute;
     }
 
     function _getAccessToken(code, callback) {
@@ -340,7 +353,7 @@ class AmazonDRS {
 
         if (type == "authorization_code") {
             data.code <- token;
-            data.redirect_uri <- http.agenturl();
+            data.redirect_uri <- _getRedirectUri();
         } else if (type == "refresh_token") {
             data.refresh_token <- token;
         } else {
