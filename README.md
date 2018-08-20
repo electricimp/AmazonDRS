@@ -36,13 +36,13 @@ The [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testd
 
 You can read more about authentication [here](https://developer.amazon.com/docs/dash/lwa-web-api.html) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html).
 
-**Note** The Refresh Token must be passed in to the library every time the agent restarta. If you don't want to go through the above authentication steps again, save the Token in the agent's persistent storage and set it with [*setRefreshToken()*](#setrefreshtokenrefreshtoken) after each agent restart. Please see [the provided example](#examples) for more details.
+**Note** The Refresh Token must be passed in to the library every time the agent restarts. If you don't want to go through the above authentication steps again, save the Token in the agent's persistent storage and set it with [*setRefreshToken()*](#setrefreshtokenrefreshtoken) after each agent restart. Please see [the provided example](#examples) for more details.
 
 ### Test Orders ###
 
 For testing purposes, Amazon DRS allows you to submit [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those made by a DRS device authenticated as a test device.
 
-As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice) has a parameter, *testDevice*, which takes a test device ID. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not and so *testDevice* is not required in this case.
+As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice) has a parameter, *testDevice*, which takes a boolen value indicating whether the device is a test device. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not and so *testDevice* is not required in this case.
 
 Only test orders can be canceled with [*cancelTestOrder()*](#canceltestorderslotid-oncanceled).
 
@@ -101,7 +101,7 @@ By default, the login endpoint's route is `"/"`. Please do not redefine the endp
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| *error* | Integer | `0` if the authentication is successful, otherwise an [error code](#error-code) otherwise. Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) |
+| *error* | Integer | `0` if the authentication is successful, otherwise an [error code](#error-code). Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) |
 | *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. For information on the response format, please see [the Amazon documentation](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-response). May also contain error details described [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#access-token-errors) and [here](https://developer.amazon.com/docs/login-with-amazon/authorization-code-grant.html#authorization-errors) |
 
 #### Return Value ####
@@ -188,7 +188,7 @@ This method places an order for a device/slot combination. For more information,
 
 | Parameter | Data Type | Description |
 | --- | --- | --- |
-| *error* | Integer | `0` if the authentication is successful, otherwise an [error code](#error-code) otherwise. Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses) |
+| *error* | Integer | `0` if the replenishment is successful, otherwise an [error code](#error-code). Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses) |
 | *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. For information on the response format, please see [the Amazon documentation](https://developer.amazon.com/docs/dash/replenish-endpoint.html#response-example). May also contain error details described [here](https://developer.amazon.com/docs/dash/replenish-endpoint.html#error-responses) |
 
 #### Return Value ####
@@ -230,7 +230,7 @@ The method can only be used for the orders made by a [test device](https://devel
 
 | Parameter | Data Type | Description |
 | --- | --- | --- |
-| *error* | Integer | `0` if the authentication is successful, otherwise an [error code](#error-code) otherwise. Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses) |
+| *error* | Integer | `0` if the cancelation is successful, otherwise an [error code](#error-code). Possible HTTP error codes [are listed here](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses) |
 | *response* | Table | Key-value table with the response provided by Amazon server. May be `null`. For information on the response format, please see [the Amazon documentation](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#response-example). May also contain [error details](https://developer.amazon.com/docs/dash/canceltestorder-endpoint.html#error-responses) |
 
 #### Return Value ####
