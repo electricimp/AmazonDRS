@@ -42,7 +42,7 @@ You can read more about authentication [here](https://developer.amazon.com/docs/
 
 For testing purposes, Amazon DRS allows you to submit [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those made by a DRS device authenticated as a test device.
 
-As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice) has a parameter, *testDevice*, which takes a boolen value indicating whether the device is a test device. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not and so *testDevice* is not required in this case.
+As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice) has a parameter, *testDevice*, which takes a boolean value indicating whether the device is a test device. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not and so *testDevice* is not required in this case.
 
 Only test orders can be canceled with [*cancelTestOrder()*](#canceltestorderslotid-oncanceled).
 
