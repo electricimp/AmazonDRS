@@ -52,7 +52,7 @@ All requests that are made to the Amazon platform occur asynchronously. Every me
 
 ### Error Codes ###
 
-Error codes are integers which specify a concrete error which occured during an operation.
+Error codes are integers which specify a concrete error which occurred during an operation.
 
 | Error Code | Description |
 | --- | --- |
