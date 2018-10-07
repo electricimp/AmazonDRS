@@ -82,9 +82,11 @@ class AmazonDRS {
     //                                      response : Table    Key-value table with the response provided by Amazon server. May be null.
     //     testDevice : Boolean         True if it is a test device. False by default.
     //          (optional)
+    //     nonLiveDevice : Boolean      True if it is a non-live (pre-production) device. False by default.
+    //          (optional)
     //
     // Returns:                         Nothing.
-    function login(rocky, deviceModel, deviceSerial, onAuthenticated = null, route = null, testDevice = false) {
+    function login(rocky, deviceModel, deviceSerial, onAuthenticated = null, route = null, testDevice = false, nonLiveDevice = false) {
         if (_loginEnabled) {
             onAuthenticated && onAuthenticated(AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED, null);
             return;
@@ -99,7 +101,7 @@ class AmazonDRS {
         }.bindenv(this);
 
         _loginEnabled = true;
-        _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, authDone);
+        _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, nonLiveDevice, authDone);
     }
 
     // Allows to set a Refresh Token manually.
@@ -226,7 +228,7 @@ class AmazonDRS {
         req.sendasync(sent);
     }
 
-    function _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, callback) {
+    function _defineLoginEndpoint(rocky, deviceModel, deviceSerial, testDevice, nonLiveDevice, callback) {
         // Define login endpoint for GET requests to the agent URL
         rocky.get(_loginRoute, function(context) {
             if ("error" in context.req.query) {
@@ -237,7 +239,7 @@ class AmazonDRS {
             // Check if an authorization code was passed in
             if (!("code" in context.req.query)) {
                 // If it wasn't, redirect to login service
-                _redirectToLWA(deviceModel, deviceSerial, context, testDevice);
+                _redirectToLWA(deviceModel, deviceSerial, context, testDevice, nonLiveDevice);
                 return;
             }
 
@@ -283,18 +285,20 @@ class AmazonDRS {
         context.send(200, "Authentication complete - you may now close this window");
     }
 
-    function _redirectToLWA(deviceModel, deviceSerial, context, testDevice) {
+    function _redirectToLWA(deviceModel, deviceSerial, context, testDevice, nonLiveDevice) {
         local location = LWA_ENDPOINT;
+        local scopeData = {
+            "dash:replenish" : {
+                "device_model" : deviceModel,
+                "serial" : deviceSerial,
+                "is_test_device" : testDevice
+            }
+        };
+        nonLiveDevice && (scopeData["dash:replenish"]["should_include_non_live"] <- true);
         local params = {
             "client_id" : _clientId,
             "scope" : "dash:replenish",
-            "scope_data" : http.jsonencode({
-                "dash:replenish" : {
-                    "device_model" : deviceModel,
-                    "serial" : deviceSerial,
-                    "is_test_device" : testDevice
-                }
-            }),
+            "scope_data" : http.jsonencode(scopeData),
             "response_type" : "code",
             "redirect_uri" : _getRedirectUri()
         };

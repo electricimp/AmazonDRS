@@ -48,6 +48,11 @@ class DummyTestCase extends ImpTestCase {
         _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth, true);
     }
 
+    function testLogin4() {
+        local onAuth = function (err, response) { };
+        _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial", onAuth, true, true);
+    }
+
     function testLoginLogin() {
         return Promise(function (resolve, reject) {
             _amazonDRSClient.login(_rocky, "deviceModel", "deviceSerial");
