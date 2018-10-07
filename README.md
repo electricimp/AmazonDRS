@@ -11,7 +11,7 @@ This version of the library supports the following functionality:
 - Canceling test orders.
 - Placing real orders for Amazon goods.
 
-**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.0.0"` **to the top of your agent code.**
+**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.1.0"` **to the top of your agent code.**
 
 ## Library Usage ##
 
@@ -125,7 +125,7 @@ Nothing. The outcome of the operation may be obtained via the *onAuthenticated* 
 
 ```squirrel
 #require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.0.0"
+#require "AmazonDRS.agent.lib.nut:1.1.0"
 
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
@@ -168,7 +168,7 @@ Nothing.
 #### Example ####
 
 ```squirrel
-#require "AmazonDRS.agent.lib.nut:1.0.0"
+#require "AmazonDRS.agent.lib.nut:1.1.0"
 
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
@@ -285,7 +285,7 @@ The following example shows proper usage of [*login()*](#loginrocky-devicemodel-
 
 ```squirrel
 #require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.0.0"
+#require "AmazonDRS.agent.lib.nut:1.1.0"
 
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
