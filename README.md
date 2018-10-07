@@ -44,19 +44,19 @@ You can read more about authentication [here](https://developer.amazon.com/docs/
 
 For testing purposes, Amazon DRS allows you to submit [test orders](https://developer.amazon.com/docs/dash/test-device-purchases.html). Test orders are those made by a DRS device authenticated as a test device.
 
-As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) has a parameter, *testDevice*, which takes a boolean value indicating whether the device is a test device. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not and so *testDevice* is not required in this case.
+As such, [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) has a parameter, *testDevice*, which takes a boolean value indicating whether the device is a test device. However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for testing or not.
 
 Only test orders can be canceled with [*cancelTestOrder()*](#canceltestorderslotid-oncanceled).
 
 ### Non-live devices ###
 
-Currently DRS devices exist in either one of two states:
+DRS devices exist in either one of two states:
  
-- **Non-live (Pre-production)**. Non-live devices are devices that are created in our DRS developer portal but have not yet passed certification and have not launched to customers. You can still edit your device in the developer portal for device details, ASIN list details, etc.
+- **Non-live (Pre-production)**. Non-live devices are devices that are created in the DRS developer portal but have not yet passed Amazon certification and have not launched to customers. You can still edit your device in the developer portal for device details, ASIN list details, etc.
  
 - **Live**. Live devices are devices that have been fully certified and put into production. Live devices cannot be edited at all because of potential impacts to customers.
 
-If your device is **non-live**, you must pass `true` as a *nonLiveDevice* parameter in to [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice). However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for **live** device or not and so *nonLiveDevice* is not required in this case.
+If your device is **non-live**, you must pass `true` as a *nonLiveDevice* parameter in to [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice). However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for **live** device or not.
 
 ### Callbacks ###
 
