@@ -56,7 +56,7 @@ Currently DRS devices exist in either one of two states:
  
 - **Live**. Live devices are devices that have been fully certified and put into production. Live devices cannot be edited at all because of potential impacts to customers.
 
-If your device is non-live, you must pass `true` as a *nonLiveDevice* parameter in to [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice).
+If your device is **non-live**, you must pass `true` as a *nonLiveDevice* parameter in to [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice). However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for **live** device or not and so *nonLiveDevice* is not required in this case.
 
 ### Callbacks ###
 
