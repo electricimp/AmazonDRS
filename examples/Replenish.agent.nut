@@ -53,7 +53,8 @@ class ReplenishExample {
 
     function start() {
         local testDevice = true;
-        _amazonDRSClient.login(_rocky, _deviceModel, _deviceSerial, onAuthenticated.bindenv(this), null, testDevice);
+        local nonLiveDevice = true;
+        _amazonDRSClient.login(_rocky, _deviceModel, _deviceSerial, onAuthenticated.bindenv(this), null, testDevice, nonLiveDevice);
     }
 
     function onAuthenticated(error, response) {
