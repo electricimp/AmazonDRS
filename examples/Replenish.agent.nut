@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.0.0"
+#require "AmazonDRS.agent.lib.nut:1.1.0"
 
 // AmazonDRS library example:
 // - authenticates the device on Amazon platform using the provided Client ID and Client Secret
@@ -53,7 +53,8 @@ class ReplenishExample {
 
     function start() {
         local testDevice = true;
-        _amazonDRSClient.login(_rocky, _deviceModel, _deviceSerial, onAuthenticated.bindenv(this), null, testDevice);
+        local nonLiveDevice = true;
+        _amazonDRSClient.login(_rocky, _deviceModel, _deviceSerial, onAuthenticated.bindenv(this), null, testDevice, nonLiveDevice);
     }
 
     function onAuthenticated(error, response) {
