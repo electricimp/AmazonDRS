@@ -31,6 +31,8 @@ const AMAZON_DRS_ERROR_LOGIN_ALREADY_CALLED = 1001;
 const AMAZON_DRS_ERROR_GENERAL              = 1010;
 
 class AmazonDRS {
+    
+    static VERSION = "1.1.0";
 
     _debugEnabled = false;
 
