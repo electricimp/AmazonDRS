@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.1.0"
+#require "AmazonDRS.agent.lib.nut:1.1.1"
 
 // AmazonDRS library example:
 // - authenticates the device on Amazon platform using the provided Client ID and Client Secret

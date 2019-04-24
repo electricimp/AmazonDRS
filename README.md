@@ -9,7 +9,7 @@ This version of the library supports the following functionality:
 - Canceling test orders.
 - Placing real orders for Amazon goods.
 
-**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.1.0"` **to the top of your agent code.**
+**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.1.1"` **to the top of your agent code.**
 
 ![Build Status](https://cse-ci.electricimp.com/app/rest/builds/buildType:(id:AmazonDRS_BuildAndTest)/statusIcon)
 

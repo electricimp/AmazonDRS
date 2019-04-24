@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2018 Electric Imp
+// Copyright 2018-19 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -32,7 +32,7 @@ const AMAZON_DRS_ERROR_GENERAL              = 1010;
 
 class AmazonDRS {
     
-    static VERSION = "1.1.0";
+    static VERSION = "1.1.1";
 
     _debugEnabled = false;
 
