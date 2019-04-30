@@ -1,7 +1,5 @@
 # Amazon DRS #
 
-[![Build Status](https://api.travis-ci.org/electricimp/AmazonDRS.svg?branch=master)](https://travis-ci.org/electricimp/AmazonDRS)
-
 This library allows your agent code to work with the [Amazon Dash Replenishment Service (DRS)](https://developer.amazon.com/dash-replenishment-service) via its [REST API](https://developer.amazon.com/docs/dash/replenish-endpoint.html).
 
 This version of the library supports the following functionality:
@@ -11,11 +9,9 @@ This version of the library supports the following functionality:
 - Canceling test orders.
 - Placing real orders for Amazon goods.
 
-**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.1.0"` **to the top of your agent code.**
+**To add this library to your project, add** `#require "AmazonDRS.agent.lib.nut:1.1.1"` **to the top of your agent code.**
 
-## Recipes ## 
-
-A complete, step-by-step recipe can be found in the [examples](./examples) folder.
+![Build Status](https://cse-ci.electricimp.com/app/rest/builds/buildType:(id:AmazonDRS_BuildAndTest)/statusIcon)
 
 ## Library Usage ##
 
@@ -96,7 +92,7 @@ This method returns a new AmazonDRS instance.
 
 This method allows you to authenticate the agent with Amazon and retrieve the required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call [*setRefreshToken()*](#setrefreshtokenrefreshtoken) after *login()*. For more information, please read the [authentication](#authentication) section. 
 
-You may re-call this method only after the previous call has finished. The call is considered to be finished only when the authentication flow described in the [authentication](#authentication) section above is completed or an error occured. Authentication should be performed before making any DRS-related requests.
+You may re-call this method only after the previous call has finished. The call is considered to be finished only when the authentication flow described in the [authentication](#authentication) section above is completed or an error occurred. Authentication should be performed before making any DRS-related requests.
 
 This method uses the [Rocky library](https://github.com/electricimp/Rocky), so it requires an instance of Rocky.
 
@@ -141,17 +137,23 @@ nonLiveDevice <- true;
 loginRoute <- "/login";
 
 function onAuthenticated(error, response) {
-  if (error != 0) {
-    server.error("Authentication error: code = " + error + " response = " + http.jsonencode(response));
-    return;
-  }
+    if (error != 0) {
+        server.error("Authentication error: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
 
-  server.log("Successfully authenticated!");
+    server.log("Successfully authenticated!");
 }
 
 client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
 rocky <- Rocky();
-client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), loginRoute, testDevice, nonLiveDevice);
+client.login(rocky, 
+             AMAZON_DRS_DEVICE_MODEL, 
+             AMAZON_DRS_DEVICE_SERIAL, 
+             onAuthenticated.bindenv(this), 
+             loginRoute, 
+             testDevice, 
+             nonLiveDevice);
 ```
 
 ### setRefreshToken(*refreshToken*) ###
@@ -219,12 +221,12 @@ Nothing. The result of the operation may be obtained via the *onReplenished* cal
 const AMAZON_DRS_SLOT_ID = "<YOUR_AMAZON_SLOT_ID>";
 
 function onReplenished(error, response) {
-  if (error != 0) {
-    server.error("Error replenishing: code = " + error + " response = " + http.jsonencode(response));
-    return;
-  }
-  
-  server.log("An order has been placed. Response from server: " + http.jsonencode(response));
+    if (error != 0) {
+        server.error("Error replenishing: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
+    
+    server.log("An order has been placed. Response from server: " + http.jsonencode(response));
 }
 
 // It is supposed that the client has been authenticated with either login() method or setRefreshToken() method
@@ -261,12 +263,12 @@ Nothing. The result of the operation may be obtained via the *onCanceled* callba
 const AMAZON_DRS_SLOT_ID = "<YOUR_AMAZON_SLOT_ID>";
 
 function onCanceled(error, response) {
-  if (error != 0) {
-    server.error("Error canceling: code = " + error + " response = " + http.jsonencode(response));
-    return;
-  }
-  
-  server.log("The order has been canceled. Response from server: " + http.jsonencode(response));
+    if (error != 0) {
+        server.error("Error canceling: code = " + error + " response = " + http.jsonencode(response));
+        return;
+    }
+    
+    server.log("The order has been canceled. Response from server: " + http.jsonencode(response));
 }
 
 // It is supposed that client has been authenticated with either login() method or setRefreshToken() method
@@ -298,43 +300,48 @@ const AMAZON_DRS_DEVICE_MODEL = "<YOUR_AMAZON_DEVICE_MODEL>";
 const AMAZON_DRS_DEVICE_SERIAL = "<YOUR_AMAZON_DEVICE_SERIAL>";
 
 function getStoredRefreshToken() {
-  local persist = server.load();
-  local amazonDRS = {};
-  if ("amazonDRS" in persist) amazonDRS = persist.amazonDRS;
-  
-  if ("refreshToken" in amazonDRS) {
-    server.log("Refresh Token found!");
-    return amazonDRS.refreshToken;
-  }
+    local persist = server.load();
+    local amazonDRS = {};
+    if ("amazonDRS" in persist) amazonDRS = persist.amazonDRS;
+    
+    if ("refreshToken" in amazonDRS) {
+        server.log("Refresh Token found!");
+        return amazonDRS.refreshToken;
+    }
 
-  return null;
+    return null;
 }
 
 client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
 
 refreshToken <- getStoredRefreshToken();
 if (refreshToken != null) {
-  client.setRefreshToken(refreshToken);
-} else {
-  function onAuthenticated(error, response) {
-    if (error != 0) {
-      server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
-      return;
-    }
-
-    refreshToken = client.getRefreshToken();
     client.setRefreshToken(refreshToken);
-    local persist = server.load();
-    persist.amazonDRS <- { "refreshToken" : refreshToken };
-    server.save(persist);
-    server.log("Successfully authenticated!");
-    server.log("Refresh Token saved!");
-  }
-  
-  local testDevice = true;
-  rocky <- Rocky();
-  client.login(rocky, AMAZON_DRS_DEVICE_MODEL, AMAZON_DRS_DEVICE_SERIAL, onAuthenticated.bindenv(this), null, testDevice);
-  server.log("Log in please!");
+} else {
+    function onAuthenticated(error, response) {
+        if (error != 0) {
+            server.error("Error authenticating: code = " + error + " response = " + http.jsonencode(response));
+            return;
+        }
+
+        refreshToken = client.getRefreshToken();
+        client.setRefreshToken(refreshToken);
+        local persist = server.load();
+        persist.amazonDRS <- { "refreshToken" : refreshToken };
+        server.save(persist);
+        server.log("Successfully authenticated!");
+        server.log("Refresh Token saved!");
+    }
+    
+    local testDevice = true;
+    rocky <- Rocky();
+    client.login(rocky, 
+                 AMAZON_DRS_DEVICE_MODEL, 
+                 AMAZON_DRS_DEVICE_SERIAL, 
+                 onAuthenticated.bindenv(this), 
+                 null, 
+                 testDevice);
+    server.log("Log in please!");
 }
 ```
 
