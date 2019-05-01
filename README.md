@@ -30,6 +30,7 @@ The library requires a Refresh Token to be able to call the Amazon DRS API. The 
 Every time you call [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) or [*setRefreshToken()*](#setrefreshtokenrefreshtoken), the library starts to use a new Refresh Token.
 
 The [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) method provides the following authentication flow:
+
 1. A user opens the agent's URL in a browser.
 1. The library handles this request and redirects the user to the Amazon login page, or to the Amazon device's settings page if the user is already logged in.
 1. The user sets up the device in the Amazon UI.
@@ -51,9 +52,9 @@ Only test orders can be canceled with [*cancelTestOrder()*](#canceltestorderslot
 ### Non-live Devices ###
 
 DRS devices exist in either one of two states:
- 
+
 - **Non-live (Pre-production) Devices** These are devices are devices that are created in the DRS developer portal but have not yet passed Amazon certification and have not launched to customers. You can still edit your device in the developer portal for device details, ASIN list details, etc.
- 
+
 - **Live Devices** These are devices that have been fully certified and put into production. Live devices cannot be edited.
 
 If your device is **non-live**, you must pass `true` as the *nonLiveDevice* parameter’s argument when calling [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice). However, if you set a Refresh Token manually with [*setRefreshToken()*](#setrefreshtokenrefreshtoken), only you know whether this token was obtained for a **live** device.
@@ -90,7 +91,7 @@ This method returns a new AmazonDRS instance.
 
 ### login(*rocky, deviceModel, deviceSerial[, onAuthenticated][, route][, testDevice][, nonLiveDevice]*) ###
 
-This method allows you to authenticate the agent with Amazon and retrieve the required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call [*setRefreshToken()*](#setrefreshtokenrefreshtoken) after *login()*. For more information, please read the [authentication](#authentication) section. 
+This method allows you to authenticate the agent with Amazon and retrieve the required security tokens. The method automatically sets the obtained tokens to be used for DRS API calls, so you do not need to call [*setRefreshToken()*](#setrefreshtokenrefreshtoken) after *login()*. For more information, please read the [authentication](#authentication) section.
 
 You may re-call this method only after the previous call has finished. The call is considered to be finished only when the authentication flow described in the [authentication](#authentication) section above is completed or an error occurred. Authentication should be performed before making any DRS-related requests.
 
@@ -124,8 +125,8 @@ Nothing. The outcome of the operation may be obtained via the *onAuthenticated* 
 #### Example ####
 
 ```squirrel
-#require "Rocky.class.nut:2.0.1"
-#require "AmazonDRS.agent.lib.nut:1.1.0"
+#require "Rocky.class.nut:2.0.2"
+#require "AmazonDRS.agent.lib.nut:1.1.1"
 
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
@@ -147,20 +148,20 @@ function onAuthenticated(error, response) {
 
 client <- AmazonDRS(AMAZON_DRS_CLIENT_ID, AMAZON_DRS_CLIENT_SECRET);
 rocky <- Rocky();
-client.login(rocky, 
-             AMAZON_DRS_DEVICE_MODEL, 
-             AMAZON_DRS_DEVICE_SERIAL, 
-             onAuthenticated.bindenv(this), 
-             loginRoute, 
-             testDevice, 
+client.login(rocky,
+             AMAZON_DRS_DEVICE_MODEL,
+             AMAZON_DRS_DEVICE_SERIAL,
+             onAuthenticated.bindenv(this),
+             loginRoute,
+             testDevice,
              nonLiveDevice);
 ```
 
 ### setRefreshToken(*refreshToken*) ###
 
-This method allows you to set a Refresh Token manually. For more information, please see the [authentication](#authentication) section. 
+This method allows you to set a Refresh Token manually. For more information, please see the [authentication](#authentication) section.
 
-Either this method or [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) should be called and authentication should be called before making any DRS-related requests.
+Either this method or [*login()*](#loginrocky-devicemodel-deviceserial-onauthenticated-route-testdevice-nonlivedevice) should be called and authentication should be established before making any DRS-related requests.
 
 #### Parameters ####
 
@@ -175,7 +176,7 @@ Nothing.
 #### Example ####
 
 ```squirrel
-#require "AmazonDRS.agent.lib.nut:1.1.0"
+#require "AmazonDRS.agent.lib.nut:1.1.1"
 
 const AMAZON_DRS_CLIENT_ID = "<YOUR_AMAZON_CLIENT_ID>";
 const AMAZON_DRS_CLIENT_SECRET = "<YOUR_AMAZON_CLIENT_SECRET>";
@@ -225,7 +226,7 @@ function onReplenished(error, response) {
         server.error("Error replenishing: code = " + error + " response = " + http.jsonencode(response));
         return;
     }
-    
+
     server.log("An order has been placed. Response from server: " + http.jsonencode(response));
 }
 
@@ -267,7 +268,7 @@ function onCanceled(error, response) {
         server.error("Error canceling: code = " + error + " response = " + http.jsonencode(response));
         return;
     }
-    
+
     server.log("The order has been canceled. Response from server: " + http.jsonencode(response));
 }
 
@@ -278,7 +279,7 @@ client.cancelTestOrder(AMAZON_DRS_SLOT_ID, onCanceled.bindenv(this));
 
 ### setDebug(*value*) ###
 
-This method enables (*value* is `true`) or disables (*value* is `false`) the library debug output, including error logging. It is disabled by default. 
+This method enables (*value* is `true`) or disables (*value* is `false`) the library debug output, including error logging. It is disabled by default.
 
 #### Return Value ####
 
@@ -303,7 +304,7 @@ function getStoredRefreshToken() {
     local persist = server.load();
     local amazonDRS = {};
     if ("amazonDRS" in persist) amazonDRS = persist.amazonDRS;
-    
+
     if ("refreshToken" in amazonDRS) {
         server.log("Refresh Token found!");
         return amazonDRS.refreshToken;
@@ -332,14 +333,14 @@ if (refreshToken != null) {
         server.log("Successfully authenticated!");
         server.log("Refresh Token saved!");
     }
-    
+
     local testDevice = true;
     rocky <- Rocky();
-    client.login(rocky, 
-                 AMAZON_DRS_DEVICE_MODEL, 
-                 AMAZON_DRS_DEVICE_SERIAL, 
-                 onAuthenticated.bindenv(this), 
-                 null, 
+    client.login(rocky,
+                 AMAZON_DRS_DEVICE_MODEL,
+                 AMAZON_DRS_DEVICE_SERIAL,
+                 onAuthenticated.bindenv(this),
+                 null,
                  testDevice);
     server.log("Log in please!");
 }
